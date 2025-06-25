@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: list-service
+  cloud:
+    nacos:
+      config:
+        server-addr: http://localhost:8848
+        namespace: nefu-music-id
+        file-extension: yaml
+      discovery:
+        group: DEV
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        namespace: ${spring.cloud.nacos.config.namespace}
+  config:
+    import:
+      - optional:nacos:localhost.yaml?group=DEV&refresh=true

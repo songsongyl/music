@@ -1,0 +1,13 @@
+
+spring:
+  application:
+    name: music-service
+logging:
+  level:
+    com.music.demo: debug
+server:
+  port: 30000
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

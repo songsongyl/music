@@ -1,0 +1,31 @@
+spring:
+  data:
+    redis:
+      host: 120.46.159.231
+      username: default
+      password: 2046
+      database: 59
+#  datasource:
+#    url: 'jdbc:mysql://120.46.159.231:3306/${mysql-account}?createDatabaseIfNotExist=true'
+#    username: ${mysql-account}
+#    password: ${mysql-account}
+#    hikari:
+#      maximum-pool-size: 1
+#  sql:
+#    init:
+#      mode: always
+#  jackson:
+#    default-property-inclusion: non_null
+  cloud:
+    nacos:
+      config:
+        server-addr: http://localhost:8848
+        namespace: nefu-music-id
+        file-extension: yaml
+      discovery:
+        group: DEV
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        namespace: ${spring.cloud.nacos.config.namespace}
+  config:
+    import:
+      - optional:nacos:localhost.yaml?group=DEV&refresh=true

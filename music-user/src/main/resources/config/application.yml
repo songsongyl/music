@@ -1,0 +1,33 @@
+mysql-account: 2022222974 # 可声明变量多处引用，避免出错
+mypath: D:\data\test
+my:
+  secretkey: sfne
+server:
+  port: 30002
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: 'jdbc:mysql://120.46.159.231:3306/${mysql-account}?createDatabaseIfNotExist=true'
+    username: ${mysql-account}
+    password: ${mysql-account}
+    hikari:
+      maximum-pool-size: 1
+  sql:
+    init:
+      mode: always
+  jackson:
+    default-property-inclusion: non_null
+  data:
+    redis:
+      host: 120.46.159.231
+      username: default
+      password: 2046
+      database: 59
+logging:
+  level:
+    com.music.demo: debug
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

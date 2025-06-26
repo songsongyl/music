@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +68,11 @@ public class MusicServiceImpl implements MusicService {
         queryWrapper.in("music_id", musicIds);
 
         return musicMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Music> findAllBySingerId(String singerId) {
+        List<Music> musicList = musicMapper.selectList(null);
+      return   musicList.stream().filter(music -> music.getAuthor().equals(singerId)).collect(Collectors.toList());
     }
 }

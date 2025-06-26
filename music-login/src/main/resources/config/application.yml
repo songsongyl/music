@@ -6,7 +6,7 @@ server:
   port: 30001
 spring:
   application:
-    name: user-service
+    name: login-service
   datasource:
     url: 'jdbc:mysql://120.46.159.231:3306/${mysql-account}?createDatabaseIfNotExist=true'
     username: ${mysql-account}

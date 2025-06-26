@@ -1,7 +1,9 @@
 package com.music.demo.user.service.impl;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.crypto.SmUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.music.demo.admin.service.AdminService;
 import com.music.demo.common.exception.user.UserSettingException;
 import com.music.demo.domain.entity.User;
 import com.music.demo.user.mapper.UserMapper;
@@ -23,15 +25,16 @@ public class ISettingServiceImpl implements ISettingService {
     @Value("${mypath}")
     private String path;
 
+    private final AdminService adminService;
     @Override
-    public void changePassword(String username, String password, String newpassword) {
+    public void changePassword(String uid, String password, String newpassword) {
         if (Objects.isNull(newpassword) || newpassword.isEmpty()) {
             throw new UserSettingException("新的密码不能为空");
         }
 
         User user =  mapper.selectOne(
                 new LambdaQueryWrapper<User>()
-                        .eq(User::getUsername,username)
+                        .eq(User::getId,uid)
         );
 
         String oldPasswordN = SmUtil.sm3(password);
@@ -65,12 +68,30 @@ public class ISettingServiceImpl implements ISettingService {
 //    }
     @SneakyThrows
     @Override
-    public void uploadAvator(MultipartFile file) {
+    public void uploadAvator(MultipartFile file,String uid) {
 
 
         String fileType = file.getContentType();
         if (!fileType.contains("image")) throw new UserSettingException("文件格式异常，请选择图片");
 //        file.transferTo(new File(path + file.getOriginalFilename()));
+        String encode = Base64.encode(file.getInputStream());
+        String ncode = SmUtil.sm3(encode);
+        User user = adminService.findById(uid);
+        user.setAvatar(ncode);
+        mapper.updateById(user);
         file.transferTo(new File(path + file.getOriginalFilename()));
+    }
+
+    @Override
+    public void changeUsername(String uid,String newUserName) {
+        if (Objects.isNull(newUserName) || newUserName.isEmpty()) {
+            throw new UserSettingException("新的用户名不能为空");
+        }
+        User user =  mapper.selectOne(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getId,uid)
+        );
+        user.setUsername(newUserName);
+        mapper.updateById(user);
     }
 }

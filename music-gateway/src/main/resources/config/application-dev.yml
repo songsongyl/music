@@ -3,3 +3,10 @@ server:
 logging:
   level:
     com.music.demo: debug
+spring:
+  data:
+    redis:
+      host: 120.46.159.231
+      username: default
+      password: 2046
+      database: 59

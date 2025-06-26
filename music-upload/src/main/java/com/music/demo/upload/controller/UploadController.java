@@ -38,7 +38,7 @@ public class UploadController {
     @Autowired
     private MusicService musicService;
 
-    @Operation(summary = "上传图片")
+    @Operation(summary = "上传封面图片")
     @PostMapping("/img/{mid}")
     @SneakyThrows
     public HttpResult<String> uploadImg(@RequestPart("file") MultipartFile file,@PathVariable String mid) {

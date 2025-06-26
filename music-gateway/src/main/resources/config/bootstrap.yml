@@ -1,3 +1,79 @@
 spring:
   main:
     web-application-type: reactive
+  application:
+    name: gateway-service
+  cloud:
+    nacos:
+#      配置文件
+      config:
+        enabled: off
+#        服务治理
+      discovery:
+        server-addr: http://localhost:8848
+        namespace: nefu-music-id
+        group: DEV
+        register-enabled: true
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: music-user-id
+          uri: lb://user-service
+          predicates:
+            - Path=/music-user/**
+          filters:
+            - StripPrefix=1
+        - id: music-login-id
+          uri: lb://login-service
+          predicates:
+            - Path=/music-login/**
+          filters:
+            - StripPrefix=1
+        - id: music-music-id
+          uri: lb://music-service
+          predicates:
+            - Path=/music-music/**
+          filters:
+            - StripPrefix=1
+        - id: music-list-id
+          uri: lb://list-service
+          predicates:
+            - Path=/music-list/**
+          filters:
+            - StripPrefix=1
+        - id: music-admin-id
+          uri: lb://admin-service
+          predicates:
+            - Path=/music-admin/**
+          filters:
+            - StripPrefix=1
+        - id: music-upload-id
+          uri: lb://upload-service
+          predicates:
+            - Path=/music-upload/**
+          filters:
+            - StripPrefix=1
+        - id: music-search-id
+          uri: lb://search-service
+          predicates:
+            - Path=/music-search/**
+          filters:
+            - StripPrefix=1
+        - id: music-message-id
+          uri: lb://message-service
+          predicates:
+            - Path=/music-message/**
+          filters:
+            - StripPrefix=1
+knife4j:
+  gateway:
+    discover:
+      enabled: true
+      version: openapi3
+    strategy: discover
+    enabled: true
+
+
+

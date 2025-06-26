@@ -14,7 +14,6 @@
         <module>music-message</module>
         <module>music-upload</module>
         <module>music-list</module>
-        <module>music-like</module>
         <module>music-domain</module>
         <module>music-common</module>
         <module>music-gateway</module>
@@ -40,6 +39,7 @@
         <spring.cloud.alibaba.version>2023.0.3.2</spring.cloud.alibaba.version>
         <spring.cloud.version>2023.0.5</spring.cloud.version>
         <spring.boot.version>3.3.10</spring.boot.version>
+        <knife4j.gateway.version>4.5.0</knife4j.gateway.version>
     </properties>
 
     <dependencyManagement>

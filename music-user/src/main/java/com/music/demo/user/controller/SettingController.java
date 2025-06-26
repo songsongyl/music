@@ -17,12 +17,18 @@ public class SettingController {
     private final ISettingService iSettingService;
 
     @Operation(summary = "用户修改密码")
-    @GetMapping("/{username}/changePassword")
-    public HttpResult<String> changePassword(@PathVariable("username") String username, String password, String newPassword) {
-        iSettingService.changePassword(username,password,newPassword);
+    @GetMapping("/changePassword")
+    public HttpResult<String> changePassword(String password, String newPassword,@RequestHeader("uid") String uid) {
+        iSettingService.changePassword(uid,password,newPassword);
         return HttpResult.success("修改成功");
     }
 
+    @Operation(summary = "用户修改名字")
+    @GetMapping("/changeUserName")
+    public HttpResult<String> changeUserName(@RequestHeader("uid") String uid,String newUserName) {
+        iSettingService.changeUsername(uid,newUserName);
+        return HttpResult.success("修改成功");
+    }
 //    @Operation(summary = "用户修改密码2")
 //    @GetMapping("/user/changePassword")
 //    public HttpResult<String> changePassword(@RequestAttribute("uid") String userId, String password, String newPassword) {
@@ -33,8 +39,8 @@ public class SettingController {
 
     @Operation(summary = "上传头像图片")
     @PostMapping("/uploadAvatar")
-    public HttpResult<String> uploadAvator(@RequestBody MultipartFile file) {
-        iSettingService.uploadAvator(file);
+    public HttpResult<String> uploadAvator(@RequestBody MultipartFile file,@RequestHeader("uid") String uid) {
+        iSettingService.uploadAvator(file,uid);
         return HttpResult.success("上传成功");
     }
 

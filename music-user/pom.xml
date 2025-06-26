@@ -31,6 +31,11 @@
             <artifactId>music-domain</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.music.demo.admin</groupId>
+            <artifactId>music-admin</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

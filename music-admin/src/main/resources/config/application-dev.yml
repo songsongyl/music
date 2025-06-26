@@ -1,16 +1,13 @@
-
+server:
+  port: 30008
 spring:
   application:
-    name: search-service
+    name: admin-service
 logging:
   level:
     com.music.demo: debug
-server:
-  port: 30006
 knife4j:
-  enable: true
+  basic:
+    enable: true
   setting:
     language: zh_cn
-mypath: D:/data/test/
-my:
-  secretkey: sfne

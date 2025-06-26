@@ -11,4 +11,5 @@ public interface MusicService {
     List<Music> findAll();
     Music findById(String id);
     List<Music> findCollectMusics(String id);
+    List<Music> findAllBySingerId(String singerId);
 }

@@ -41,6 +41,12 @@ public class MusicController {
         return HttpResult.success(list);
     }
 
+    @GetMapping("/findAllBySingerId")
+    @Operation(summary = "查找某一歌手的所有歌曲")
+    public HttpResult<List<Music>> findAllBySingerId(@RequestParam String singerId) {
+        List<Music> list = musicService.findAllBySingerId(singerId);
+        return HttpResult.success(list);
+    }
     @PutMapping("/updateMusic")
     @Operation(summary = "更新歌曲")
     public HttpResult<String> updateList(@RequestBody Music music) {

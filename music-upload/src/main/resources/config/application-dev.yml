@@ -8,7 +8,7 @@ logging:
   level:
     com.music.demo: debug
 server:
-  port: 30008
+  port: 30009
 knife4j:
   enable: true
   setting:

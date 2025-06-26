@@ -36,6 +36,9 @@ public class IRegistryServiceImpl implements IRegistryService {
         if (Objects.isNull(user.getPassword()) || user.getPassword().isEmpty()) {
             throw new UsernameEmptyException("注册失败，密码不能为空");
         }
+        if (Objects.isNull(user.getUsername()) || user.getUsername().isEmpty()) {
+            throw new UsernameEmptyException("注册失败，用户名不能为空");
+        }
 
         String newP = SmUtil.sm3(user.getPassword());
         user.setPassword(newP);
@@ -44,6 +47,7 @@ public class IRegistryServiceImpl implements IRegistryService {
         user.setUpdateby("admin");
         user.setRole(User.USER);
         user.setUpdateTime(new Date());
+
 
         mapper.insert(user);
         BloomFilterUtil.getInstance().add(user.getUsername());

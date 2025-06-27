@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -52,4 +54,13 @@ public class Music {
 
     @TableField("music_collect_count")
     private Integer collectCount;
+
+    @TableField("music_createtime")
+    private Date createTime;
+
+    @TableField("music_updatetime")
+    private Date updateTime;
+
+    @TableField("music_path")
+    private String path;
 }

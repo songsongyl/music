@@ -1,0 +1,21 @@
+server:
+  port: 30006
+logging:
+  level:
+    com.music.demo: debug
+spring:
+  application:
+    name: message-service
+  data:
+    redis:
+      host: 120.46.159.231
+      username: default
+      password: 2046
+      database: 59
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+mypath: D:\data\test
+my:
+  secretkey: sfne

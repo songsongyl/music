@@ -19,7 +19,7 @@ import java.util.Date;
 public class Notice {
 
     @TableId(value = "notice_id", type = IdType.AUTO)
-    private Integer id;
+    private String id;
 
     @TableField("notice_title")
     private String title;

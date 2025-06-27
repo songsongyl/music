@@ -83,15 +83,18 @@ public class ISettingServiceImpl implements ISettingService {
     }
 
     @Override
-    public void changeUsername(String uid,String newUserName) {
-        if (Objects.isNull(newUserName) || newUserName.isEmpty()) {
-            throw new UserSettingException("新的用户名不能为空");
+    public void changeUserSettings(String uid,User user) {
+        if (Objects.isNull(user)) {
+            throw new UserSettingException("新的用户信息不能为空");
         }
-        User user =  mapper.selectOne(
+        User user1 =  mapper.selectOne(
                 new LambdaQueryWrapper<User>()
                         .eq(User::getId,uid)
         );
-        user.setUsername(newUserName);
-        mapper.updateById(user);
+        user1.setEmail(user.getEmail());
+        user1.setPhone(user.getPhone());
+        user1.setName(user.getName());
+        user1.setUsername(user.getUsername());
+        mapper.updateById(user1);
     }
 }

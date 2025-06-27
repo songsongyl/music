@@ -2,6 +2,7 @@ package com.music.demo.login.service.impl;
 
 import cn.hutool.crypto.SmUtil;
 import com.music.demo.common.exception.user.UserCredentialsException;
+import com.music.demo.common.exception.user.UserSettingException;
 import com.music.demo.common.exception.user.UsernameEmptyException;
 import com.music.demo.common.util.ULID;
 import com.music.demo.domain.entity.User;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -42,12 +44,27 @@ public class IRegistryServiceImpl implements IRegistryService {
 
         String newP = SmUtil.sm3(user.getPassword());
         user.setPassword(newP);
-
         user.setId(ulid.nextULID());
         user.setUpdateby("admin");
-        user.setRole(User.USER);
+        if(user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole(User.USER);
+        }
         user.setUpdateTime(new Date());
+        // 邮箱校验
+        String email = user.getEmail();
+        if (Objects.nonNull(email) && !email.isEmpty()) {
+            if (!Pattern.matches("^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$", email)) {
+                throw new UserSettingException("注册失败，邮箱格式不正确");
+            }
+        }
 
+        // 手机号校验
+        String phone = user.getPhone();
+        if (Objects.nonNull(phone) && !phone.isEmpty()) {
+            if (!Pattern.matches("^1[3-9]\\d{9}$", phone)) {
+                throw new UserSettingException("注册失败，手机号格式不正确");
+            }
+        }
 
         mapper.insert(user);
         BloomFilterUtil.getInstance().add(user.getUsername());

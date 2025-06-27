@@ -2,6 +2,7 @@ package com.music.demo.gateway.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.music.demo.common.result.HttpResult;
+import com.music.demo.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -20,63 +20,47 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-/**
- * 网关的全局过滤器
- */
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class MusicGatewayFilter implements GlobalFilter, Ordered {
-
-    private final StringRedisTemplate stringRedisTemplate;
-
-
+public class SingerGatewayFilter implements GlobalFilter, Ordered {
     @SneakyThrows
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.debug("来到网关过滤器中...");
 
-        ServerHttpRequest request = exchange.getRequest(); //请求
-        ServerHttpResponse response = exchange.getResponse(); //响应
-
-        System.err.println(request.getURI());
+        ServerHttpRequest request = exchange.getRequest();
+        ServerHttpResponse response = exchange.getResponse();
 
         String path = request.getURI().getPath();
-        if (path.contains("/api/login") || path.contains("/api/register")|| path.contains("v3/api-docs")) {
-//            放行
+        //如果不是knife4j接口文档或者不是管理员路径，放行
+        if (path.contains("v3/api-docs") || !path.contains("api/music/singer")) {
             return chain.filter(exchange);
         }
 
-        //2. 获取token
         HttpHeaders headers = request.getHeaders();
-        List<String> hs = headers.get("token");
+        List<String> hs = headers.get("role");
+        log.debug("{}",hs);
 
         ObjectMapper mapper = new ObjectMapper();
         DataBuffer dataBuffer = null;
 
-//        ObjectMapper mapper = null;
-        if (hs == null || hs.isEmpty()) {
-//            异常抛出
+        if (hs == null || hs.isEmpty() ) {
             response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
-            HttpResult<String> result = HttpResult.failed("token不存在，用户登录异常");
+            HttpResult<String> result = HttpResult.failed("role不存在，歌手访问异常");
             dataBuffer = response.bufferFactory().wrap(
-                    mapper.writeValueAsString(
-                                    result)
-                            .getBytes(StandardCharsets.UTF_8));
-            return response.writeWith(Mono.just(dataBuffer));
+                    mapper.writeValueAsString(result).getBytes(StandardCharsets.UTF_8)
+            );
 
+            return response.writeWith(Mono.just(dataBuffer));
         }
 
-        String token = hs.get(0);
-        if (!stringRedisTemplate.hasKey(token)) {
-//            异常抛出
+        if (!hs.get(0).equals(User.SINGER)) {
             response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
-            HttpResult<String> result = HttpResult.failed("非法登录，访问异常");
+            HttpResult<String> result = HttpResult.failed("非歌手，访问异常");
             dataBuffer = response.bufferFactory().wrap(
-                    mapper.writeValueAsString(
-                                    result)
-                            .getBytes(StandardCharsets.UTF_8));
+                    mapper.writeValueAsString(result).getBytes(StandardCharsets.UTF_8)
+            );
+
             return response.writeWith(Mono.just(dataBuffer));
         }
         return chain.filter(exchange);
@@ -84,6 +68,6 @@ public class MusicGatewayFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return NettyWriteResponseFilter.WRITE_RESPONSE_FILTER_ORDER - 2;
+        return NettyWriteResponseFilter.WRITE_RESPONSE_FILTER_ORDER - 1;
     }
 }

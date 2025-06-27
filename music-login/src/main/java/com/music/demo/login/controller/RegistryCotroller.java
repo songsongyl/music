@@ -20,7 +20,7 @@ public class RegistryCotroller {
     private final IRegistryService iRegistryService;
 
     @Operation(summary = "测试用户注册")
-    @PostMapping("/registry")
+    @PostMapping("/register")
     public HttpResult<String> registry(@RequestBody User user) {
         iRegistryService.registry(user);
         return HttpResult.success("注册成功");

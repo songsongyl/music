@@ -1,6 +1,7 @@
 package com.music.demo.user.controller;
 
 import com.music.demo.common.result.HttpResult;
+import com.music.demo.domain.entity.User;
 import com.music.demo.user.service.ISettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,10 +24,10 @@ public class SettingController {
         return HttpResult.success("修改成功");
     }
 
-    @Operation(summary = "用户修改名字")
-    @GetMapping("/changeUserName")
-    public HttpResult<String> changeUserName(@RequestHeader("uid") String uid,String newUserName) {
-        iSettingService.changeUsername(uid,newUserName);
+    @Operation(summary = "用户修改个人信息")
+    @PostMapping("/changeUserSettings")
+    public HttpResult<String> changeUserName(@RequestHeader("uid") String uid,@RequestBody User user) {
+        iSettingService.changeUserSettings(uid,user);
         return HttpResult.success("修改成功");
     }
 //    @Operation(summary = "用户修改密码2")

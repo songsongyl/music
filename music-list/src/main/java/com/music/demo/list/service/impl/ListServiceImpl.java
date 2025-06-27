@@ -25,6 +25,15 @@ public class ListServiceImpl implements ListService {
     @Override
     public void add(MusicList list) {
         list.setId(ulid.nextULID());
+        if(list.getListName() == null || list.getListName().equals("")){
+            throw new MusicException("歌单标题为空");
+        }
+        if(list.getUserId() == null || list.getUserId().equals("")){
+            throw new MusicException("歌单作者为空");
+        }
+        if(list.getMusicIds() == null || list.getMusicIds().equals("")){
+            throw new MusicException("歌单歌曲为空");
+        }
         listMapper.insert(list);
     }
 

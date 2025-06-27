@@ -2,6 +2,8 @@ package com.music.demo.music.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.music.demo.common.exception.music.MusicException;
+import com.music.demo.common.exception.user.UserCredentialsException;
+import com.music.demo.common.exception.user.UsernameEmptyException;
 import com.music.demo.common.util.ULID;
 import com.music.demo.domain.entity.Music;
 import com.music.demo.music.mapper.MusicMapper;
@@ -26,6 +28,18 @@ public class MusicServiceImpl implements MusicService {
     @Override
     public void add(Music music) {
         music.setId(ulid.nextULID());
+        if(music.getTitle() == null || music.getTitle().equals("")){
+            throw new MusicException("音乐标题为空");
+        }
+        if(music.getAuthor() == null || music.getAuthor().equals("")){
+            throw new MusicException("音乐作者为空");
+        }
+        if(music.getDuration() == null || music.getDuration().equals("")){
+            throw new MusicException("音乐时长为空");
+        }
+        if(music.getPath() == null || music.getPath().equals("")){
+            throw new MusicException("音乐路径为空");
+        }
         musicMapper.insert(music);
     }
 

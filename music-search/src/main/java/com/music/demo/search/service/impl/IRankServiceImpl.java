@@ -43,7 +43,6 @@ public class IRankServiceImpl implements IRankService {
              musicList1.add(mapper.selectById(musicId));
         }
 
-
         return musicList1;
     }
 

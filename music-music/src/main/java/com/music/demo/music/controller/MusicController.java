@@ -21,13 +21,13 @@ public class MusicController {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Operation(summary = "添加歌曲")
-    @PostMapping("/addMusic")
+    @PostMapping("/singer/addMusic")
     public HttpResult<String> addList(@RequestBody Music music) {
         musicService.add(music);
         return HttpResult.success(music.getTitle()+"添加成功");
     }
 
-    @DeleteMapping("/deleteMusic/{mid}")
+    @DeleteMapping("/singer/deleteMusic/{mid}")
     @Operation(summary = "删除歌曲")
     public HttpResult<String> deleteMusic(@PathVariable String mid) {
         musicService.delete(mid);
@@ -47,7 +47,7 @@ public class MusicController {
         List<Music> list = musicService.findAllBySingerId(singerId);
         return HttpResult.success(list);
     }
-    @PutMapping("/updateMusic")
+    @PutMapping("/singer/updateMusic")
     @Operation(summary = "更新歌曲")
     public HttpResult<String> updateList(@RequestBody Music music) {
         musicService.update(music);

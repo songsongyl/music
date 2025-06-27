@@ -5,6 +5,7 @@ import com.music.demo.domain.entity.MusicList;
 import com.music.demo.list.service.ListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,14 +35,16 @@ public class ListController {
 
     @GetMapping("/findAll")
     @Operation(summary = "查找所有歌单")
-    public HttpResult<List<MusicList>> findAllList() {
+    public HttpResult<List<MusicList>> findAllList(HttpServletRequest request) {
         List<MusicList> list = listService.findAll();
+        log.debug("111" +request.getHeader("token"));
         return HttpResult.success(list);
     }
 
     @Operation(summary = "查找某一用户的所有歌单")
     @GetMapping("/findALlByUId")
     public HttpResult<List<MusicList>> findAllByUId(@RequestHeader("uid") String uid){
+        log.debug("list"+uid);
        return HttpResult.success( listService.findByUserId(uid));
     }
 

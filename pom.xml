@@ -20,8 +20,6 @@
         <module>music-search</module>
         <module>music-login</module>
         <module>music-user</module>
-
-
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

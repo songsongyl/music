@@ -37,9 +37,7 @@ public class MusicServiceImpl implements MusicService {
         if(music.getDuration() == null || music.getDuration().equals("")){
             throw new MusicException("音乐时长为空");
         }
-        if(music.getPath() == null || music.getPath().equals("")){
-            throw new MusicException("音乐路径为空");
-        }
+
         musicMapper.insert(music);
     }
 

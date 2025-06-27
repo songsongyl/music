@@ -1,10 +1,14 @@
 package com.music.demo.gateway.filter;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.music.demo.common.result.HttpResult;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
@@ -30,7 +34,8 @@ import java.util.List;
 public class MusicGatewayFilter implements GlobalFilter, Ordered {
 
     private final StringRedisTemplate stringRedisTemplate;
-
+    @Value("${my.secretkey}")
+    private  String SALT;
 
     @SneakyThrows
     @Override
@@ -51,7 +56,7 @@ public class MusicGatewayFilter implements GlobalFilter, Ordered {
         //2. 获取token
         HttpHeaders headers = request.getHeaders();
         List<String> hs = headers.get("token");
-
+//        log.debug(hs.toString());
         ObjectMapper mapper = new ObjectMapper();
         DataBuffer dataBuffer = null;
 
@@ -79,7 +84,17 @@ public class MusicGatewayFilter implements GlobalFilter, Ordered {
                             .getBytes(StandardCharsets.UTF_8));
             return response.writeWith(Mono.just(dataBuffer));
         }
-        return chain.filter(exchange);
+                DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(SALT)).build().verify(token);
+        String uid = decodedJWT.getClaim("uid").asString();
+        String role = decodedJWT.getClaim("role").asString();
+        log.debug(role);
+        log.debug(uid);
+        ServerHttpRequest modifiedRequest = request.mutate()
+                .header("uid", uid)
+                .header("role", role)
+                .build();
+        return chain.filter(exchange.mutate().request(modifiedRequest).build());
+//        return chain.filter(exchange);
     }
 
     @Override

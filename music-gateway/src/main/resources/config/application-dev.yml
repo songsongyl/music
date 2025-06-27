@@ -10,3 +10,5 @@ spring:
       username: default
       password: 2046
       database: 59
+my:
+  secretkey: sfne

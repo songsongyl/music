@@ -61,6 +61,5 @@ public class Music {
     @TableField("music_updatetime")
     private Date updateTime;
 
-    @TableField("music_path")
-    private String path;
+
 }

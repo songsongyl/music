@@ -38,14 +38,15 @@ public class LoginController {
         User user = iLoginService.login(username, password);
 
         String token = JWT.create()
-                .withClaim("username", username)
+                .withClaim("role", user.getRole())
+                .withClaim("uid", user.getId())
                 .withExpiresAt(
                         new Date(System.currentTimeMillis() + 1000*60*15)
                 )
                 .sign(Algorithm.HMAC256(SALT));
-        ObjectMapper mapper = new ObjectMapper();
-        String userStr = mapper.writeValueAsString(user);
-        stringRedisTemplate.opsForValue().set(token, userStr, 30, TimeUnit.MINUTES);
+      //  ObjectMapper mapper = new ObjectMapper();
+       // String userStr = mapper.writeValueAsString(user);
+        stringRedisTemplate.opsForValue().set(token, user.getId(), 30, TimeUnit.MINUTES);
 //        stringRedisTemplate.opsForValue().set("uid", user.getId());
 //        stringRedisTemplate.opsForValue().set("role", user.getRole());
         response.addHeader("token", token);

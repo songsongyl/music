@@ -1,8 +1,10 @@
 package com.music.demo.upload.controller;
 
+import com.music.demo.common.exception.music.MusicException;
 import com.music.demo.common.result.HttpResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -15,8 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,76 +33,99 @@ public class DownLoadController {
     @Value("${mypath}")
     private String path;
 
-    @Operation(summary = "文件下载")
-    @GetMapping("/downloadFile/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
-        log.info("开始处理文件下载请求: {}", fileName);
-
-        try {
-            // 验证文件名是否合法
-            if (fileName == null || fileName.contains("..")) {
-                log.error("非法文件名: {}", fileName);
-                return ResponseEntity.badRequest().build();
-            }
-
-            // 构建完整文件路径
-            Path basePath = Paths.get(path).toAbsolutePath().normalize();
-            Path filePath = basePath.resolve(fileName).normalize();
-
-            // 检查路径是否在允许的目录内
-            if (!filePath.startsWith(basePath)) {
-                log.error("尝试访问目录外的文件: {}", filePath);
-                return ResponseEntity.badRequest().build();
-            }
-
-            log.info("尝试访问文件路径: {}", filePath);
-
-            File songFile = filePath.toFile();
-
-            // 检查文件存在性和可读性
-            if (!songFile.exists()) {
-                log.error("文件不存在: {}", filePath);
-                return ResponseEntity.notFound().build();
-            }
-
-            if (!songFile.isFile()) {
-                log.error("不是有效文件: {}", filePath);
-                return ResponseEntity.badRequest().build();
-            }
-
-            if (!songFile.canRead()) {
-                log.error("文件不可读: {}", filePath);
-                return ResponseEntity.status(403).build();
-            }
-
-            // 确定内容类型
-            String contentType = Files.probeContentType(filePath);
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
-
-            // 获取文件大小
-            long fileSize = songFile.length();
-            log.info("文件大小: {} 字节", fileSize);
-
-            // 编码文件名
-            String encodedFilename = URLEncoder.encode(songFile.getName(), StandardCharsets.UTF_8)
-                    .replaceAll("\\+", "%20");
-
-            // 创建文件资源
-            Resource resource = new FileSystemResource(songFile);
-
-            // 设置响应头
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .contentLength(fileSize)
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + encodedFilename + "\"; filename*=UTF-8''" + encodedFilename)
-                    .body(resource);
-
-        } catch (IOException e) {
-            log.error("文件下载失败: {}", fileName, e);
-            return ResponseEntity.internalServerError().build();
+    @Operation(summary = "音频下载")
+    @GetMapping("/downloadAudio")
+    public void downloadAudio(HttpServletResponse response, String name) throws FileNotFoundException {
+        if (name == null || name.contains("..")) {
+            throw new MusicException("非法文件名！");
         }
+        // 下载本地文件
+        String fileName = "new" + name; // 保存的文件的默认保存名
+        log.debug(response.toString());
+        // 读到流中
+        InputStream inStream = new FileInputStream(path + name);// 要保存的文件的存放路径
+        // 设置输出的格式
+        response.reset();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        // 循环取出流中的数据
+        byte[] b = new byte[4096];
+        int len;
+        try {
+            while ((len = inStream.read(b)) > 0)
+                response.getOutputStream().write(b, 0, len);
+            inStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//            return HttpResult.success(fileName);
+    }
+
+    @Operation(summary = "歌词下载")
+    @GetMapping("/downloadLyrics")
+    public void downloadLyrics(HttpServletResponse response, String name) throws FileNotFoundException {
+        if (name == null || name.contains("..")) {
+            throw new MusicException("非法文件名！");
+        }
+        // 下载本地文件
+        String fileName = "new" + name; // 保存的文件的默认保存名
+        // 读到流中
+        InputStream inStream = new FileInputStream(path + name);// 要保存的文件的存放路径
+        // 设置输出的格式
+        response.reset();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        // 循环取出流中的数据
+        byte[] b = new byte[4096];
+        int len;
+        try {
+            while ((len = inStream.read(b)) > 0)
+                response.getOutputStream().write(b, 0, len);
+            inStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Operation(summary = "图片下载")
+    @GetMapping("/downloadImg")
+    public void downloadImg(HttpServletResponse response, String name) throws FileNotFoundException {
+// 1. 校验文件名（防止路径遍历攻击）
+        if (name == null || name.contains("..") || name.contains("/") || name.contains("\\")) {
+            throw new MusicException("非法文件名！");
+        }
+
+        // 2. 拼接文件路径
+        String filePath = path + name;
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new MusicException("文件不存在");
+        }
+        // 3. 设置响应头（强制下载 + 支持中文文件名）
+        String downloadFileName = "new" + name;
+        String encodedFileName = URLEncoder.encode(downloadFileName, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20"); // 替换空格编码
+
+        response.reset();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE); // 通用二进制流
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + encodedFileName + "\"; filename*=UTF-8''" + encodedFileName);
+        response.setContentLengthLong(file.length()); // 设置文件大小（可选）
+
+        // 4. 读取文件并写入响应流
+        try (InputStream inStream = new FileInputStream(file);
+             OutputStream outStream = response.getOutputStream()) {
+
+            byte[] buffer = new byte[8192]; // 8KB 缓冲区
+            int bytesRead;
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+            outStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("文件下载失败", e);
+        }
+
     }
 }

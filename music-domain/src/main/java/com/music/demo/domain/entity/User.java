@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -52,4 +54,13 @@ public class User {
 
     @TableField("user_role")
     private String role;
+
+    @Schema(description = "邮箱是否被激活",defaultValue = "false")
+    @TableField("user_email_enable")
+    private Integer emailEnable;
+
+//    // 激活相关字段
+//    private boolean enabled = false; // 默认未激活
+//    private String activationCode; // 激活码
+//    private LocalDateTime activationCodeExpireTime; // 激活码过期时间
 }

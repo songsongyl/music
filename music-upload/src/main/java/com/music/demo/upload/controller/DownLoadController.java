@@ -1,28 +1,22 @@
 package com.music.demo.upload.controller;
 
-import com.music.demo.common.exception.music.MusicException;
-import com.music.demo.common.result.HttpResult;
+import com.music.demo.common.exception.file.FileException;
+
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 
 @Tag(name = "文件下载")
 @RequestMapping("/api/download")
@@ -37,7 +31,7 @@ public class DownLoadController {
     @GetMapping("/downloadAudio")
     public void downloadAudio(HttpServletResponse response, String name) throws FileNotFoundException {
         if (name == null || name.contains("..")) {
-            throw new MusicException("非法文件名！");
+            throw new FileException("非法文件名！");
         }
         // 下载本地文件
         String fileName = "new" + name; // 保存的文件的默认保存名
@@ -65,7 +59,7 @@ public class DownLoadController {
     @GetMapping("/downloadLyrics")
     public void downloadLyrics(HttpServletResponse response, String name) throws FileNotFoundException {
         if (name == null || name.contains("..")) {
-            throw new MusicException("非法文件名！");
+            throw new FileException("非法文件名！");
         }
         // 下载本地文件
         String fileName = "new" + name; // 保存的文件的默认保存名
@@ -93,14 +87,14 @@ public class DownLoadController {
     public void downloadImg(HttpServletResponse response, String name) throws FileNotFoundException {
 // 1. 校验文件名（防止路径遍历攻击）
         if (name == null || name.contains("..") || name.contains("/") || name.contains("\\")) {
-            throw new MusicException("非法文件名！");
+            throw new FileException("非法文件名！");
         }
 
         // 2. 拼接文件路径
         String filePath = path + name;
         File file = new File(filePath);
         if (!file.exists()) {
-            throw new MusicException("文件不存在");
+            throw new FileException("文件不存在");
         }
         // 3. 设置响应头（强制下载 + 支持中文文件名）
         String downloadFileName = "new" + name;

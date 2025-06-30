@@ -8,6 +8,6 @@ public interface IRegistryService {
     //    void addUser(User user);
     List<User> findAll();
     //    User findSingleUser();
-    void registry(User user);
-
+    void registry(User user,String EmailCode);
+    boolean findEmail(String email);
 }

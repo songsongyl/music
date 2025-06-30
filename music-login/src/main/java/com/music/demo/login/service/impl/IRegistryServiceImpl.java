@@ -1,6 +1,7 @@
 package com.music.demo.login.service.impl;
 
 import cn.hutool.crypto.SmUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.music.demo.common.exception.user.UserCredentialsException;
 import com.music.demo.common.exception.user.UserSettingException;
 import com.music.demo.common.exception.user.UsernameEmptyException;
@@ -8,6 +9,7 @@ import com.music.demo.common.util.ULID;
 import com.music.demo.domain.entity.User;
 import com.music.demo.login.mapper.UserMapper;
 import com.music.demo.login.service.IRegistryService;
+import com.music.demo.login.service.ISendMailService;
 import com.music.demo.login.util.BloomFilterUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 @Service
@@ -23,6 +26,7 @@ public class IRegistryServiceImpl implements IRegistryService {
 
     private final UserMapper mapper;
     private final ULID ulid;
+    private final ISendMailService sendMailService;
 
     @Override
     public List<User> findAll() {
@@ -30,7 +34,7 @@ public class IRegistryServiceImpl implements IRegistryService {
     }
 
     @Override
-    public void registry(User user) {
+    public void registry(User user,String emailCode) {
 
         String username = user.getUsername();
         boolean isExist = BloomFilterUtil.getInstance().contains(username);
@@ -58,6 +62,8 @@ public class IRegistryServiceImpl implements IRegistryService {
             }
         }
 
+        if(findEmail(email)) throw new UserSettingException("邮箱已存在");
+
         // 手机号校验
         String phone = user.getPhone();
         if (Objects.nonNull(phone) && !phone.isEmpty()) {
@@ -65,10 +71,21 @@ public class IRegistryServiceImpl implements IRegistryService {
                 throw new UserSettingException("注册失败，手机号格式不正确");
             }
         }
+        
 
         mapper.insert(user);
         BloomFilterUtil.getInstance().add(user.getUsername());
+
+
     }
 
+    @Override
+    public boolean findEmail(String email) {
+    if(mapper.selectCount(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getEmail, email)
+        ) >0) return true;
 
+       return false;
+    }
 }
